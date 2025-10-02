@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Patch SQL Injection - Lab</title>
+</head>
+<body>
+<h2>Login Sistema</h2>
+<div>
+<label>Username:</label>
+<input type="text" id="username">
+</div>
+<br>
+<button onclick="mostraDifferenza()">Vedi la Differenza</button>
+<div id="risultato"></div>
+<script>
+function mostraDifferenza() {
+let user = document.getElementById("username").value || "admin' OR '1'='1";
+// 1. APPROCCIO VULNERABILE (mai fare!)
+let sqlVulnerabile = "SELECT * FROM users WHERE username = " + user + "'";
+// 2. APPROCCIO SICURO (nel backend)
+let sqlSicuro = "SELECT * FROM users WHERE username = ?";
+let parametri = [user];
+document.getElementById("risultato").innerHTML =
+"<h3>CONFRONTO:</h3>" +
+"<div style='background: #ffcccc; padding: 10px; margin: 10px;'>" +
+"<h4>❌ VULNERABILE (concatenazione):</h4>" +
+"<p><strong>Query:</strong> <code>" + sqlVulnerabile + "</code></p>" +
+"<p><strong>Problema:</strong> L'input diventa CODICE SQL</p>" +
+"<p><strong>Risultato:</strong> La query cerca: <code>'admin' OR '1'='1</code> come CONDIZIONE</p>" +
+"</div>" +
+"<div style='background: #ccffcc; padding: 10px; margin: 10px;'>" +
+"<h4>✅ SICURO (prepared statement):</h4>" +
+"<p><strong>Query:</strong> <code>" + sqlSicuro + "</code></p>" +
+"<p><strong>Parametri:</strong> <code>" + JSON.stringify(parametri) + "</code></p>" +
+"<p><strong>Vantaggio:</strong> L'input rimane un DATO</p>" +
+"<p><strong>Risultato:</strong> Il database cerca username = <code>'admin' OR '1'='1'</code> come TESTO</p>" +
+"</div>" +
+"<p><strong>Nota:</strong> I prepared statement funzionano solo nel backend. Questo è solo un esempio dimostrativo.</p>";
+}
+</script>
+</body>
+</html>
